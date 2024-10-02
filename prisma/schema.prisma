@@ -1,0 +1,120 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
+  name          String?
+  matric         String?         @unique
+  email          String?         @unique
+  emailVerified DateTime?
+  imageUrl         String?
+  password      String
+  cart        Cart[]
+  accounts      StudentAccount[]
+}
+
+model MenuItem {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  restaurantId String? @db.ObjectId 
+  name      String @unique
+  price    Int
+  quantity   Int
+  foodImage String?
+  category  String?
+  cart      CartItem[]
+
+
+  user Restaurant? @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+}
+
+model Cart {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String? @db.ObjectId
+  restaurantId String? @db.ObjectId
+  items    CartItem[]
+
+  user User? @relation(fields: [userId],references: [id], onDelete:Cascade)
+  restaurant Restaurant? @relation(fields: [restaurantId], references: [id], onDelete:Cascade)
+
+  @@map("carts")
+}
+
+model CartItem {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  menuItemId String @db.ObjectId
+  menuItem MenuItem @relation(fields: [menuItemId],references: [id], onDelete:Cascade)
+  quantity   Int
+  cartId    String? @db.ObjectId
+  cart Cart? @relation(fields: [cartId],references: [id], onDelete:Cascade)
+
+  @@map("cart_items")
+}
+
+
+
+model FoodCategory {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String @unique
+
+  user Restaurant? @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  restaurantId String? @db.ObjectId 
+}
+
+model Restaurant {
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
+  name          String?         @unique
+  email         String?         @unique
+  emailVerified DateTime?
+  imageUrl         String?
+  password      String
+  accounts      RestaurantAccount[]
+  items         MenuItem[]
+  categories    FoodCategory[]
+  cart          Cart[]
+}
+
+model StudentAccount {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.String
+  access_token      String? @db.String
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.String
+  session_state     String?
+
+ 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  @@unique([provider, providerAccountId])
+}
+
+model RestaurantAccount {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.String
+  access_token      String? @db.String
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.String
+  session_state     String?
+
+ 
+  user Restaurant @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  @@unique([provider, providerAccountId])
+}
