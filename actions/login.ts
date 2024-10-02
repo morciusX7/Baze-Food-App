@@ -36,6 +36,8 @@ export const studentLogin = async (
 
     throw error;
   }
+
+  return { success: "Valid Fields" };
 };
 
 export const vendorLogin = async (
@@ -67,6 +69,8 @@ export const vendorLogin = async (
 
     throw error;
   }
+
+  return { success: "Valid Fields" };
 };
 
 export const GetUser = async (id: string) => {
