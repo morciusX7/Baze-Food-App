@@ -43,8 +43,8 @@ export const VendorLoginForm = () => {
 
     startTransition(() => {
       vendorLogin(values).then((data) => {
-        setError(data.error);
-        setSuccess(data.success);
+        setError(data?.error);
+        setSuccess(data?.success);
       });
     });
   };
